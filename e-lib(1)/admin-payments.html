@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Logs | Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --bg: #0f0e17; --surface: #1c1b29; --text: #fffffe; --primary: #ff8906; }
+        body { background-color: var(--bg); color: var(--text); padding: 30px; }
+        .card { background-color: var(--surface); border: 1px solid #333; color: white; }
+        .table { color: white; }
+        .text-price { color: #2cb67d; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>💰 Transaction History</h2>
+            <a href="admin.html" class="btn btn-outline-light btn-sm">← Back to Dashboard</a>
+        </div>
+
+        <div class="card p-3 shadow">
+            <table class="table table-dark table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>TX ID</th>
+                        <th>User Email</th>
+                        <th>Item Purchased</th>
+                        <th>Amount</th>
+                        <th>Date & Time</th>
+                    </tr>
+                </thead>
+                <tbody id="paymentTableBody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function loadPayments() {
+            try {
+                const res = await fetch("http://localhost:5000/api/admin/payments");
+                const payments = await res.json();
+                document.getElementById('paymentTableBody').innerHTML = payments.map(p => `
+                    <tr>
+                        <td>#${p.id}</td>
+                        <td>${p.user_email}</td>
+                        <td>${p.item_name}</td>
+                        <td class="text-price">₹${p.amount}</td>
+                        <td class="small text-muted">${new Date(p.transaction_date).toLocaleString()}</td>
+                    </tr>
+                `).join('');
+            } catch (e) { alert("Failed to load payments"); }
+        }
+        loadPayments();
+    </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Master Admin | BookHaven</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --bg: #0f0e17; --surface: #1c1b29; --text: #fffffe; --primary: #ff8906; }
+        body { background-color: var(--bg); color: var(--text); padding-top: 50px; }
+        .admin-card { 
+            background: var(--surface); border: 1px solid #333; transition: 0.3s; 
+            cursor: pointer; text-decoration: none; color: white; height: 100%;
+        }
+        .admin-card:hover { transform: translateY(-10px); border-color: var(--primary); color: var(--primary); }
+        .icon-box { font-size: 3rem; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container text-center">
+        <h1 class="fw-bold mb-2">Admin Dashboard</h1>
+        <p class="text-muted mb-5">Select a module to manage your library</p>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-3">
+                <a href="admin-books.html" class="card admin-card p-4 shadow" target="_blank">
+                    <div class="icon-box">📚</div>
+                    <h4>Manage Books</h4>
+                    <p class="small opacity-50">Add, Edit, or Remove titles</p>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="admin-users.html" class="card admin-card p-4 shadow" target="_blank">
+                    <div class="icon-box">👥</div>
+                    <h4>User Management</h4>
+                    <p class="small opacity-50">Promote or manage members</p>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="admin-payments.html" class="card admin-card p-4 shadow" target="_blank">
+                    <div class="icon-box">💰</div>
+                    <h4>Payment Logs</h4>
+                    <p class="small opacity-50">View all transactions</p>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="admin-carousel.html" class="card admin-card p-4 shadow" target="_blank">
+                    <div class="icon-box">🖼️</div>
+                    <h4>Hero Slides</h4>
+                    <p class="small opacity-50">Manage homepage carousel</p>
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-5">
+            <a href="index.html" class="btn btn-outline-secondary">Logout & Return to Site</a>
+        </div>
+    </div>
+
+    <script>
+        // Security Guard
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || user.role !== 'admin') {
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>

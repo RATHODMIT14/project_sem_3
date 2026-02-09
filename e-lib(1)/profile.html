@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | BookHaven</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root { --surface: #1a1a1a; --primary: #0d6efd; }
+        body.dark-mode { background-color: #0f0f0f; color: white; font-family: 'Source Sans Pro', sans-serif; }
+        .profile-card { background: var(--surface); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; }
+        .stat-box { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 15px; text-align: center; border: 1px solid rgba(255,193,7,0.2); }
+        .membership-badge { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .book-thumb { width: 60px; height: 80px; object-fit: cover; border-radius: 4px; }
+    </style>
+</head>
+<body class="dark-mode">
+
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top" style="background: rgba(15,15,15,0.95); border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-2" href="index.html">📚 BookHaven</a>
+            <div class="d-flex align-items-center gap-3">
+                <a href="index.html" class="btn btn-outline-light btn-sm rounded-pill px-3">Back to Library</a>
+                <button class="btn btn-danger btn-sm rounded-pill px-3" onclick="doLogout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="profile-card p-4 text-center shadow">
+                    <div class="mb-3">
+                        <div class="rounded-circle bg-primary d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px; font-size: 2rem;">
+                            <span id="userInitials">U</span>
+                        </div>
+                    </div>
+                    <h3 id="profileName" class="fw-bold mb-1">Username</h3>
+                    <p id="profileEmail" class="text-muted mb-3">user@example.com</p>
+                    <span id="planBadge" class="badge bg-warning text-dark membership-badge mb-4">Free Member</span>
+                    
+                    <div class="row g-2 text-start">
+                        <div class="col-12">
+                            <div class="stat-box">
+                                <small class="text-muted d-block">Membership Status</small>
+                                <strong id="expiryStatus" class="text-warning">Active until --</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="profile-card p-4 mb-4 shadow">
+                    <h4 class="fw-bold mb-4">Account Overview</h4>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="small opacity-50">Member Since</label>
+                            <p class="fw-bold">January 2026</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="small opacity-50">Total Books Read</label>
+                            <p class="fw-bold" id="booksReadCount">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-card p-4 shadow">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-bold mb-0">My Library</h4>
+                        <a href="index.html#books-section" class="btn btn-primary btn-sm">Browse More</a>
+                    </div>
+                    
+                    <div id="userBooks" class="list-group list-group-flush bg-transparent">
+                        <div class="text-center py-5 opacity-50">
+                            <p>You haven't purchased or saved any books yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Use the same localStorage logic from your home page
+        let currentUser = JSON.parse(localStorage.getItem('user'));
+
+        function initProfile() {
+    if (!currentUser) {
+        window.location.href = 'index.html';
+        return;
+    }
+
+    // Basic Info
+    document.getElementById('profileName').innerText = currentUser.username;
+    document.getElementById('profileEmail').innerText = currentUser.email;
+    document.getElementById('userInitials').innerText = currentUser.username.charAt(0).toUpperCase();
+    document.getElementById('planBadge').innerText = (currentUser.membership_plan || 'Free') + " Member";
+
+    // Membership Logic
+    if (currentUser.end_date && currentUser.membership_plan !== 'free') {
+        const date = new Date(currentUser.end_date).toLocaleDateString('en-IN', {
+            day: 'numeric', month: 'long', year: 'numeric'
+        });
+        document.getElementById('expiryStatus').innerText = `Valid until ${date}`;
+    } else {
+        document.getElementById('expiryStatus').innerText = "No active subscription";
+    }
+
+    // --- DS RENDER LOGIC ---
+    const historyContainer = document.getElementById('userBooks');
+    const readCountElement = document.getElementById('booksReadCount');
+    
+    if (currentUser.history && currentUser.history.length > 0) {
+        readCountElement.innerText = currentUser.history.length;
+
+        historyContainer.innerHTML = currentUser.history.map(book => `
+            <div class="d-flex align-items-center justify-content-between p-3 mb-2 border-bottom border-secondary bg-dark rounded shadow-sm">
+                <div class="d-flex align-items-center">
+                    <img src="${book.cover_url}" class="me-3" style="width:45px; height:60px; object-fit:cover; border-radius: 4px;">
+                    <div>
+                        <h6 class="mb-0 text-white fw-bold">${book.title}</h6>
+                        <small class="text-muted small">${book.author}</small>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-success mb-1" style="font-size: 0.65rem;">OWNED</span>
+                    <div class="text-warning" style="font-size: 0.75rem;">${new Date(book.date).toLocaleDateString()}</div>
+                </div>
+            </div>
+
+        
+        `).join('');
+    } else {
+        readCountElement.innerText = "0";
+        historyContainer.innerHTML = `<div class="text-center py-5 opacity-50"><p>No purchased books yet.</p></div>`;
+    }
+}
+
+        function doLogout() {
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+
+        window.onload = initProfile;
+    </script>
+</body>
+</html>

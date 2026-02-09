@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookHaven | Pro Library</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .dropdown-menu-dark .dropdown-item:hover { background-color: rgba(255, 193, 7, 0.2); }
+        .book-img { width: 100%; height: 350px; object-fit: cover; }
+    </style>
+</head>
+<body class="dark-mode">
+
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-2" href="#">📚 BookHaven</a>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#membership-trigger">Membership</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#books-section">Books</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-outline-warning btn-sm rounded-pill px-3" onclick="toggleMode()" id="modeToggle">☀️ Light</button>
+                    <button class="cart-btn" onclick="openCart()">
+                        🛒 <span class="badge rounded-pill cart-badge" id="cartCount">0</span>
+                    </button>
+                    <div id="auth-zone" class="d-flex gap-2"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header id="home" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <div class="container h-100 d-flex align-items-center">
+                    <div class="row w-100 align-items-center">
+                        <div class="col-md-7">
+                            <h1 class="hero-title">Your Gateway to Knowledge</h1>
+                            <p class="fs-4 opacity-75 mb-4">Discover thousands of hand-picked titles.</p>
+                            <a href="#books-section" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow">Start Reading</a>
+                        </div>
+                        <div class="col-md-5 text-center d-none d-md-block" style="font-size: 12rem;">📗</div>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-item" id="membership-trigger">
+                <div class="container h-100 d-flex align-items-center">
+                    <div class="row w-100 align-items-center">
+                        <div class="col-md-7">
+                            <h1 class="hero-title text-warning">Premium Membership</h1>
+                            <p class="fs-4 opacity-75 mb-4">Unlimited downloads & ad-free experience.</p>
+                            <button onclick="openMembershipSelection()" class="btn btn-secondary btn-lg px-5 py-3 rounded-pill shadow">Join Premium 💎</button>
+                        </div>
+                        <div class="col-md-5 text-center d-none d-md-block" style="font-size: 12rem;">🎯</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" data-bs-target="#home" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
+        <button class="carousel-control-next" data-bs-target="#home" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
+    </header>
+
+    <section class="container search-section">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <input type="text" id="searchInput" class="form-control search-input shadow" placeholder="Search books...">
+            </div>
+        </div>
+    </section>
+
+    <section id="books-section" class="container py-5 mt-5">
+        <h2 class="display-5 fw-bold hero-title mb-5" style="font-size: 2.5rem;">Featured Collection</h2>
+        <div class="row g-4" id="bookGrid"></div>
+    </section>
+
+    <div class="modal fade" id="loginModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white p-4 border-primary shadow-lg">
+                <h4 class="fw-bold mb-3">Login</h4>
+                <input type="email" id="logEmail" class="form-control mb-2" placeholder="Email">
+                <input type="password" id="logPass" class="form-control mb-3" placeholder="Password">
+                <button class="btn btn-primary w-100 py-2" onclick="doLogin()">Sign In</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="regModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white p-4 border-primary shadow-lg">
+                <h4 class="fw-bold mb-3">Register</h4>
+                <div id="regInputs">
+                    <input type="text" id="regName" class="form-control mb-2" placeholder="Username">
+                    <input type="email" id="regEmail" class="form-control mb-2" placeholder="Email">
+                    <input type="password" id="regPass" class="form-control mb-3" placeholder="Password">
+                    <button class="btn btn-primary w-100 py-2" id="sendOtpBtn" onclick="sendOTP()">Send OTP</button>
+                </div>
+                <div id="otpSection" style="display: none;">
+                    <div class="alert alert-warning py-2 small">OTP has been sent to your email!</div>
+                    <input type="text" id="otpInput" class="form-control mb-3" placeholder="Enter 6-digit OTP">
+                    <button class="btn btn-success w-100 py-2" id="verifyBtn" onclick="verifyOTPAndRegister()">Verify & Create Account</button>
+                    <button class="btn btn-link btn-sm text-muted w-100 mt-2" onclick="goBackToReg()">Edit Email / Username</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="cartModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white p-4 border-warning">
+                <h4 class="fw-bold mb-3">Your Cart</h4>
+                <div id="cartItemsList" class="mb-3"></div>
+                <div class="d-flex justify-content-between fw-bold mb-3">
+                    <span>Total:</span>
+                    <span id="cartTotal">₹0</span>
+                </div>
+                <button class="btn btn-primary w-100" onclick="proceedToPaymentFromCart()">Checkout & Pay</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="planModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white border-warning p-4">
+                <h4 class="fw-bold mb-3 text-warning">Choose Your Plan</h4>
+                <div class="list-group">
+                    <button onclick="addToCart('Membership: 1 Month', 499, true, 30)" class="list-group-item list-group-item-action bg-dark text-white border-secondary mb-2 rounded">🗓️ 1 Month — ₹499</button>
+                    <button onclick="addToCart('Membership: 3 Months', 1299, true, 90)" class="list-group-item list-group-item-action bg-dark text-white border-secondary mb-2 rounded">🗓️ 3 Months — ₹1,299</button>
+                    <button onclick="addToCart('Membership: Yearly', 3999, true, 365)" class="list-group-item list-group-item-action bg-dark text-white border-secondary mb-2 rounded">👑 Yearly — ₹3,999</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="paymentModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white p-4 border-primary">
+                <h4 class="fw-bold mb-3">Payment Gateway</h4>
+                <p id="paymentInfo" class="text-warning mb-3"></p>
+                <div class="mb-3">
+                    <label class="small mb-1 opacity-75">Card Details</label>
+                    <input type="text" class="form-control mb-2 bg-secondary border-0 text-white" placeholder="1234 5678 9101 1121">
+                    <div class="row g-2">
+                        <div class="col-6"><input type="text" class="form-control bg-secondary border-0 text-white" placeholder="MM/YY"></div>
+                        <div class="col-6"><input type="password" class="form-control bg-secondary border-0 text-white" placeholder="CVV"></div>
+                    </div>
+                </div>
+                <button class="btn btn-primary w-100 py-2" id="payBtn" onclick="finalizePayment()">Confirm Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="container-fluid py-3 text-center" style="background: var(--surface); border-top: 1px solid rgba(255,255,255,0.05);">
+        <p class="small opacity-50 mb-0">© 2026 BookHaven Pro Library. 
+           <a href="admin.html" class="text-decoration-none text-muted ms-2">Admin Access</a>
+        </p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let allBooks = [], filteredBooks = [];
+        let currentUser = JSON.parse(localStorage.getItem('user')) || null;
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let tempTx = { price: 0, plan: '' };
+
+        async function init() {
+            checkMembershipExpiry();
+            updateAuthUI();
+            updateCartBadge();
+            try {
+                const res = await fetch('http://localhost:5000/api/books');
+                allBooks = await res.json();
+                filteredBooks = [...allBooks];
+                render();
+            } catch (err) { console.error("Books fetch error", err); }
+        }
+
+        // --- UPDATED DOWNLOAD LOGIC VIA BACKEND PROXY ---
+        function downloadFile(url, title) {
+            const fileName = title.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".pdf";
+            // Pointing to the new route in your server.js
+            const proxyUrl = `http://localhost:5000/api/download?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(fileName)}`;
+            
+            const link = document.createElement('a');
+            link.href = proxyUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // --- AUTH & OTP LOGIC ---
+        async function sendOTP() {
+            const email = document.getElementById('regEmail').value;
+            const btn = document.getElementById('sendOtpBtn');
+            if(!email) return alert("Please enter email");
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Sending...`;
+            try {
+                const res = await fetch('http://localhost:5000/api/send-otp', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+                if(data.success) {
+                    document.getElementById('regInputs').style.display = 'none';
+                    document.getElementById('otpSection').style.display = 'block';
+                } else {
+                    alert(data.message);
+                    btn.disabled = false;
+                    btn.innerText = "Send OTP";
+                }
+            } catch(e) { alert("Server error"); btn.disabled = false; }
+        }
+
+        function goBackToReg() {
+            document.getElementById('regInputs').style.display = 'block';
+            document.getElementById('otpSection').style.display = 'none';
+            document.getElementById('sendOtpBtn').disabled = false;
+            document.getElementById('sendOtpBtn').innerText = "Send OTP";
+        }
+
+        async function verifyOTPAndRegister() {
+            const username = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPass').value;
+            const otp = document.getElementById('otpInput').value;
+            const btn = document.getElementById('verifyBtn');
+            if(!otp) return alert("Enter OTP code");
+            btn.disabled = true;
+            btn.innerText = "Verifying...";
+            try {
+                const res = await fetch('http://localhost:5000/api/register', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ username, email, password, otp })
+                });
+                const data = await res.json();
+                if(data.success) {
+                    alert("Account Created successfully!");
+                    location.reload();
+                } else {
+                    alert(data.message);
+                    btn.disabled = false;
+                    btn.innerText = "Verify & Create Account";
+                }
+            } catch(e) { alert("Server error"); btn.disabled = false; }
+        }
+
+        async function doLogin() {
+            const res = await fetch('http://localhost:5000/api/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email: document.getElementById('logEmail').value, password: document.getElementById('logPass').value })
+            });
+            const data = await res.json();
+            if(data.success) { 
+                localStorage.setItem('user', JSON.stringify(data.user)); 
+                location.reload(); 
+            } else alert(data.message);
+        }
+
+        function doLogout() {
+    // 1. Clear the user session from storage
+    localStorage.removeItem('user');
+    
+    // 2. Clear the cart (optional: usually carts are cleared on logout for security)
+    localStorage.removeItem('cart'); 
+    
+    // 3. Redirect to the main landing page
+    // This ensures that if they logout from the profile page, they are sent home safely.
+    window.location.href = 'index.html'; 
+}
+
+        // --- CART & PAYMENT ---
+        function updateCartBadge() { document.getElementById('cartCount').innerText = cart.length; }
+
+        function addToCart(title, price, isMembership = false, days = 0) {
+            if(!currentUser) return new bootstrap.Modal(document.getElementById('loginModal')).show();
+            if (cart.find(item => item.title === title)) return alert("Already in cart");
+            cart.push({ title, price, isMembership, days });
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartBadge();
+            const pModal = bootstrap.Modal.getInstance(document.getElementById('planModal'));
+            if(pModal) pModal.hide();
+            alert("Added to cart!");
+        }
+
+        function openCart() {
+            if(cart.length === 0) return alert("Cart is empty!");
+            const list = document.getElementById('cartItemsList');
+            let total = 0;
+            list.innerHTML = cart.map((item, index) => {
+                total += item.price;
+                return `<div class="d-flex justify-content-between border-bottom border-secondary py-2">
+                    <span>${item.title}</span>
+                    <span>₹${item.price} <button class="btn btn-sm text-danger" onclick="removeItem(${index})">×</button></span>
+                </div>`;
+            }).join('');
+            document.getElementById('cartTotal').innerText = `₹${total}`;
+            new bootstrap.Modal(document.getElementById('cartModal')).show();
+        }
+
+        function removeItem(index) {
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartBadge();
+            openCart();
+        }
+
+        function proceedToPaymentFromCart() {
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            const planItem = cart.find(i => i.isMembership);
+            tempTx.price = total;
+            tempTx.plan = planItem ? planItem.title : "Books Purchase";
+            document.getElementById('paymentInfo').innerText = `Total Amount: ₹${total}`;
+            bootstrap.Modal.getInstance(document.getElementById('cartModal')).hide();
+            new bootstrap.Modal(document.getElementById('paymentModal')).show();
+        }
+
+
+        async function finalizePayment() {
+    const btn = document.getElementById('payBtn');
+    btn.disabled = true;
+    btn.innerText = "Processing...";
+    
+    const membership = cart.find(i => i.isMembership);
+    let endDate = currentUser.end_date;
+    let planName = currentUser.membership_plan;
+
+    if(membership) {
+        const end = new Date();
+        end.setDate(end.getDate() + membership.days);
+        endDate = end.toISOString();
+        planName = membership.title.replace('Membership: ', '');
+    }
+
+    try {
+        const res = await fetch('http://localhost:5000/api/update-membership-status', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ 
+                email: currentUser.email, 
+                plan: planName, 
+                end_date: endDate, 
+                price: tempTx.price, 
+                item_name: tempTx.plan 
+            })
+        });
+        const data = await res.json();
+        
+        if(data.success) {
+            // --- NEW HISTORY LOGIC (DS IMPLEMENTATION) ---
+            if (!currentUser.history) currentUser.history = [];
+            
+            cart.forEach(item => {
+                if(!item.isMembership) { // Only add books to library history
+                    // DS Logic: Unshift adds to the front (Most Recent First)
+                    currentUser.history.unshift({
+                        title: item.title,
+                        author: "BookHaven Edition",
+                        cover_url: "https://via.placeholder.com/150", // Use real cover if available
+                        date: new Date().toISOString()
+                    });
+                }
+            });
+
+            // Keep only the last 10 items (Queue Constraint)
+            if (currentUser.history.length > 10) currentUser.history.pop();
+
+            currentUser.membership_plan = planName;
+            currentUser.end_date = endDate;
+            
+            localStorage.setItem('user', JSON.stringify(currentUser));
+            localStorage.setItem('cart', JSON.stringify([]));
+            
+            alert("Payment Successful! Items added to your Profile.");
+            location.reload();
+        }
+    } catch (e) { 
+        alert("Payment Failed"); 
+        btn.disabled = false; 
+    }
+}
+
+
+
+        function openMembershipSelection() {
+            if(!currentUser) return new bootstrap.Modal(document.getElementById('loginModal')).show();
+            new bootstrap.Modal(document.getElementById('planModal')).show();
+        }
+
+        // --- UI & RENDER ---
+       function updateAuthUI() {
+    const zone = document.getElementById('auth-zone');
+    if (currentUser) {
+        const isAdmin = currentUser.role === 'admin';
+        
+        // Clean display name for the button
+        const displayPlan = (currentUser.membership_plan || 'Free').toUpperCase();
+
+        zone.innerHTML = `
+            <div class="dropdown">
+                <button class="btn btn-primary btn-sm rounded-pill px-4 dropdown-toggle shadow-sm" data-bs-toggle="dropdown" aria-expanded="false">
+                    👤 ${currentUser.username} <small class="ms-1 opacity-75">(${displayPlan})</small>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow-lg border-secondary">
+                    <li><a class="dropdown-item py-2" href="profile.html">⚙️ My Profile</a></li>
+                    
+                    ${isAdmin ? `
+                        <li><hr class="dropdown-divider border-secondary"></li>
+                        <li><a class="dropdown-item text-warning fw-bold py-2" href="admin.html">📊 Admin Dashboard</a></li>
+                    ` : ''}
+                    
+                    <li><hr class="dropdown-divider border-secondary"></li>
+                    <li><a class="dropdown-item text-danger py-2" href="#" onclick="doLogout()">🚪 Logout</a></li>
+                </ul>
+            </div>`;
+    } else {
+        zone.innerHTML = `
+            <button class="btn btn-outline-light btn-sm px-3 rounded-pill" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
+            <button class="btn btn-primary btn-sm px-3 rounded-pill" data-bs-toggle="modal" data-bs-target="#regModal">Register</button>`;
+    }
+}
+       function render() {
+    document.getElementById('bookGrid').innerHTML = filteredBooks.map(b => {
+        // Check ownership in our History Data Structure
+        const isOwned = currentUser && currentUser.history && 
+                        currentUser.history.some(h => h.title === b.title);
+
+        const isPremium = currentUser && currentUser.membership_plan && 
+                          currentUser.membership_plan.toLowerCase() !== 'free';
+
+        const hasAccess = b.is_free || isPremium || isOwned;
+        const priceINR = b.price ? Math.round(b.price * 80) : 199;
+
+        return `
+            <div class="col-md-3">
+                <div class="card book-card shadow h-100 border-0">
+                    <img src="${b.cover_url}" class="book-img">
+                    <div class="card-body d-flex flex-column bg-dark text-white">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <h6 class="fw-bold mb-0">${b.title}</h6>
+                            ${isOwned ? '<span class="badge bg-success" style="font-size: 0.6rem;">OWNED</span>' : ''}
+                        </div>
+                        <p class="small opacity-75 mb-3">${b.author}</p>
+                        <div class="mt-auto">
+                        ${!hasAccess ? 
+                            `<button class="btn btn-secondary btn-sm w-100 rounded-pill" onclick="addToCart('${b.title}', ${priceINR})">🛒 Buy ₹${priceINR}</button>` : 
+                            `<div class="d-flex gap-2">
+                                <a href="${b.book_url}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm flex-fill rounded-pill">Read</a>
+                                <button onclick="downloadFile('${b.book_url}', '${b.title}')" class="btn btn-outline-warning btn-sm flex-fill rounded-pill">PDF</button>
+                            </div>`
+                        }
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+    }).join('');
+}
+
+        function checkMembershipExpiry() {
+            if (currentUser && currentUser.membership_plan !== 'free' && currentUser.end_date) {
+                if (new Date() > new Date(currentUser.end_date)) {
+                    currentUser.membership_plan = 'free';
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                    location.reload();
+                }
+            }
+        }
+
+
+        
+
+        function toggleMode() { document.body.classList.toggle('light-mode'); }
+        window.onload = init;
+    </script>
+</body>
+</html>

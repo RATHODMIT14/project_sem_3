@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Books | Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --bg: #0f0e17; --surface: #1c1b29; --text: #fffffe; --primary: #ff8906; }
+        body { background-color: var(--bg); color: var(--text); padding: 30px; }
+        .card { background-color: var(--surface); border: 1px solid #333; color: white; }
+        .table { color: white; border-color: #444; }
+        input, select { background-color: #242633 !important; border: 1px solid #444 !important; color: white !important; }
+        .book-preview { width: 40px; height: 60px; object-fit: cover; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>📚 Manage Library Books</h2>
+            <a href="admin.html" class="btn btn-outline-light btn-sm">← Back to Dashboard</a>
+        </div>
+
+        <div class="card p-4 mb-5 shadow">
+            <h5 class="mb-3 text-primary">Add New Book</h5>
+            <form id="bookForm">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="small opacity-75">Title</label>
+                        <input type="text" id="title" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="small opacity-75">Author</label>
+                        <input type="text" id="author" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="small opacity-75">Price (INR)</label>
+                        <input type="number" id="price" class="form-control" value="0">
+                    </div>
+                    <div class="col-md-5">
+                        <label class="small opacity-75">Cover Image URL</label>
+                        <input type="url" id="cover_url" class="form-control" required>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="small opacity-75">PDF/Read URL</label>
+                        <input type="url" id="book_url" class="form-control" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="small opacity-75">Access</label>
+                        <select id="is_free" class="form-select">
+                            <option value="1">Free</option>
+                            <option value="0">Premium</option>
+                        </select>
+                    </div>
+                    <div class="col-12 mt-3">
+                        <button type="submit" class="btn btn-primary px-4">Publish Book</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <h5>Current Collection</h5>
+        <div class="card p-3 shadow">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Cover</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Type</th>
+                        <th>Price</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="bookTableBody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://localhost:5000/api";
+
+        // --- 1. Load Books ---
+        async function loadBooks() {
+            const res = await fetch(`${API_BASE}/books`);
+            const books = await res.json();
+            document.getElementById('bookTableBody').innerHTML = books.map(b => `
+                <tr class="align-middle">
+                    <td><img src="${b.cover_url}" class="book-preview"></td>
+                    <td class="fw-bold">${b.title}</td>
+                    <td>${b.author}</td>
+                    <td><span class="badge ${b.is_free ? 'bg-success' : 'bg-warning'}">${b.is_free ? 'FREE' : 'PREMIUM'}</span></td>
+                    <td>₹${b.price || 0}</td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteBook(${b.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // --- 2. Add Book ---
+        document.getElementById('bookForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const bookData = {
+                title: document.getElementById('title').value,
+                author: document.getElementById('author').value,
+                cover_url: document.getElementById('cover_url').value,
+                book_url: document.getElementById('book_url').value,
+                price: document.getElementById('price').value,
+                is_free: document.getElementById('is_free').value
+            };
+
+            const res = await fetch(`${API_BASE}/admin/add-book`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(bookData)
+            });
+            const data = await res.json();
+            if(data.success) {
+                alert("Book Added!");
+                document.getElementById('bookForm').reset();
+                loadBooks();
+            }
+        });
+
+        // --- 3. Delete Book ---
+        async function deleteBook(id) {
+            if(!confirm("Are you sure you want to remove this book?")) return;
+            const res = await fetch(`${API_BASE}/admin/delete-book/${id}`, { method: 'DELETE' });
+            if(res.ok) {
+                alert("Book Deleted");
+                loadBooks();
+            }
+        }
+
+        loadBooks();
+    </script>
+</body>
+</html>
