@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Management | Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --bg: #0f0e17; --surface: #1c1b29; --text: #fffffe; --primary: #ff8906; }
+        body { background-color: var(--bg); color: var(--text); padding: 30px; }
+        .card { background-color: var(--surface); border: 1px solid #333; color: white; }
+        .table { color: white; vertical-align: middle; }
+        .plan-badge { background-color: var(--primary); color: #000; font-weight: bold; }
+        .status-active { color: #2cb67d; }
+        .status-expired { color: #ef4565; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>👥 User Management</h2>
+            <a href="admin.html" class="btn btn-outline-light btn-sm">← Back to Dashboard</a>
+        </div>
+
+        <div class="card p-3 shadow">
+            <table class="table table-dark table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Plan</th>
+                        <th>Start Date</th>
+                        <th>Expiry Date</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function loadUsers() {
+            try {
+                const res = await fetch("http://localhost:5000/api/admin/users");
+                const users = await res.json();
+                
+                const now = new Date();
+
+                document.getElementById('userTableBody').innerHTML = users.map(u => {
+                    // Logic to determine if subscription is active
+                    let statusHtml = '<span class="text-muted">N/A</span>';
+                    if (u.end_date) {
+                        const expiry = new Date(u.end_date);
+                        statusHtml = expiry > now 
+                            ? '<span class="status-active">● Active</span>' 
+                            : '<span class="status-expired">● Expired</span>';
+                    }
+
+                    return `
+                        <tr>
+                            <td>${u.id}</td>
+                            <td><strong>${u.username}</strong></td>
+                            <td>${u.email}</td>
+                            <td><span class="badge plan-badge">${u.membership_plan.toUpperCase()}</span></td>
+                            <td class="small">${u.start_date ? new Date(u.start_date).toLocaleDateString() : '-'}</td>
+                            <td class="small">${u.end_date ? new Date(u.end_date).toLocaleDateString() : '-'}</td>
+                            <td><span class="text-info">${u.role}</span></td>
+                            <td>${statusHtml}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (e) { 
+                console.error(e);
+                alert("Error connecting to server"); 
+            }
+        }
+        
+        loadUsers();
+    </script>
+</body>
+</html>
