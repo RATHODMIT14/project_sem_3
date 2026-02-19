@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | BookHaven</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --bg: #0f0e17; --surface: #1c1b29; --text: #fffffe; --primary: #ff8906; }
+        body { background-color: var(--bg); color: var(--text); font-family: sans-serif; }
+        .sidebar { background-color: var(--surface); min-height: 100vh; border-right: 1px solid #333; }
+        .nav-link { color: #a7a9be; margin-bottom: 10px; border-radius: 8px; }
+        .nav-link.active { background-color: var(--primary); color: white; }
+        .card { background-color: var(--surface); border: 1px solid #333; color: white; }
+        .table { color: white; border-color: #333; }
+        input, select { background-color: #242633 !important; border: 1px solid #444 !important; color: white !important; }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <nav class="col-md-2 d-none d-md-block sidebar p-4">
+            <h4 class="text-primary fw-bold mb-4">Admin Panel</h4>
+            <div class="nav flex-column nav-pills" id="adminTabs" role="tablist">
+                <button class="nav-link active text-start" data-bs-toggle="pill" data-bs-target="#tab-books">📚 Manage Books</button>
+                <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#tab-users" onclick="loadUsers()">👥 View Users</button>
+                <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#tab-payments" onclick="loadPayments()">💰 Payment Logs</button>
+            </div>
+            <hr>
+            <a href="index.html" class="btn btn-outline-secondary btn-sm w-100">Back to Site</a>
+        </nav>
+
+        <main class="col-md-10 p-5">
+            <div class="tab-content">
+                
+                <div class="tab-pane fade show active" id="tab-books">
+                    <h2 class="mb-4">Add New Book</h2>
+                    <div class="card p-4 shadow">
+                        <form id="bookForm">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Book Title</label>
+                                    <input type="text" id="title" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Author Name</label>
+                                    <input type="text" id="author" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Cover Image URL</label>
+                                    <input type="url" id="cover_url" class="form-control" placeholder="https://..." required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Book PDF/Read URL</label>
+                                    <input type="url" id="book_url" class="form-control" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Price (INR)</label>
+                                    <input type="number" id="price" class="form-control" value="0">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Type</label>
+                                    <select id="is_free" class="form-select">
+                                        <option value="1">Free</option>
+                                        <option value="0">Premium</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <button type="submit" class="btn btn-primary px-5">Publish Book</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-users">
+                    <h2 class="mb-4">Registered Users</h2>
+                    <div class="card p-3 text-nowrap overflow-auto">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th><th>Username</th><th>Email</th><th>Role</th><th>Plan</th><th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-payments">
+                    <h2 class="mb-4">Recent Transactions</h2>
+                    <div class="card p-3">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>TX ID</th><th>User</th><th>Item</th><th>Amount</th><th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="paymentTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // --- 1. SECURITY CHECK ---
+    (function() {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || user.role !== 'admin') {
+            alert("Access Denied! Administrators only.");
+            window.location.href = "index.html";
+        }
+    })();
+
+    const API_BASE = "http://localhost:5000/api/admin";
+
+    // Handle Adding Books
+    document.getElementById('bookForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const bookData = {
+            title: document.getElementById('title').value,
+            author: document.getElementById('author').value,
+            cover_url: document.getElementById('cover_url').value,
+            book_url: document.getElementById('book_url').value,
+            price: document.getElementById('price').value,
+            is_free: document.getElementById('is_free').value
+        };
+
+        const res = await fetch(`${API_BASE}/add-book`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(bookData)
+        });
+        const data = await res.json();
+        if(data.success) {
+            alert("Book Added!");
+            document.getElementById('bookForm').reset();
+        }
+    });
+
+    // --- 2. LOAD USERS WITH PROMOTE OPTION ---
+    async function loadUsers() {
+        const res = await fetch(`${API_BASE}/users`);
+        const users = await res.json();
+        document.getElementById('userTableBody').innerHTML = users.map(u => `
+            <tr>
+                <td>${u.id}</td>
+                <td>${u.username}</td>
+                <td>${u.email}</td>
+                <td><span class="badge ${u.role === 'admin' ? 'bg-danger' : 'bg-info'}">${u.role}</span></td>
+                <td><span class="badge ${u.membership_plan === 'free' ? 'bg-secondary' : 'bg-warning'}">${u.membership_plan}</span></td>
+                <td>
+                    ${u.role !== 'admin' ? 
+                    `<button class="btn btn-sm btn-outline-warning" onclick="makeAdmin('${u.email}')">Make Admin</button>` : 
+                    `<span class="text-success small">Verified Admin</span>`}
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // --- 3. PROMOTE USER FUNCTION ---
+    async function makeAdmin(email) {
+        if(!confirm("Give full administrative access to " + email + "?")) return;
+        
+        const res = await fetch(`${API_BASE}/promote`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ email: email })
+        });
+        const data = await res.json();
+        if(data.success) {
+            alert("User promoted to Admin!");
+            loadUsers();
+        }
+    }
+
+    // Load Payments
+    async function loadPayments() {
+        const res = await fetch(`${API_BASE}/payments`);
+        const payments = await res.json();
+        document.getElementById('paymentTableBody').innerHTML = payments.map(p => `
+            <tr>
+                <td>#${p.id}</td>
+                <td>${p.user_email}</td>
+                <td>${p.item_name}</td>
+                <td class="text-success">₹${p.amount}</td>
+                <td>${new Date(p.transaction_date).toLocaleString()}</td>
+            </tr>
+        `).join('');
+    }
+</script>
+</body>
+</html>

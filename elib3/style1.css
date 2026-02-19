@@ -1,0 +1,367 @@
+/* --- STUDIO PLEY COSMIC THEME --- */
+:root {
+    --bg: #070512;
+    --primary: #8b5cf6;
+    --accent: #d946ef;
+    --surface: rgba(255, 255, 255, 0.04);
+    --border: rgba(255, 255, 255, 0.1);
+    --text: #ffffff;
+    --nav-glass: rgba(255, 255, 255, 0.05);
+}
+
+body.light-mode {
+    --bg: #f5f3ff;
+    --primary: #6d28d9;
+    --accent: #db2777;
+    --surface: #ffffff;
+    --border: rgba(0, 0, 0, 0.08);
+    --text: #1e1b4b;
+    --nav-glass: rgba(255, 255, 255, 0.85);
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* --- BACKGROUND FX (FIXED Z-INDEX) --- */
+.nebula-bg {
+    position: fixed; inset: 0;
+    background: radial-gradient(circle at 15% 25%, rgba(26, 11, 61, 0.8) 0%, transparent 45%),
+                radial-gradient(circle at 85% 75%, rgba(13, 6, 38, 0.8) 0%, transparent 45%);
+    z-index: -2;
+    pointer-events: none;
+}
+
+.glow-mesh {
+    position: fixed; inset: 0;
+    background-image: radial-gradient(var(--primary) 0.5px, transparent 0.5px);
+    background-size: 40px 40px;
+    opacity: 0.1;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* --- NAVBAR --- */
+.navbar-glass {
+    background: var(--nav-glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    z-index: 1050;
+}
+
+.brand-box {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+}
+
+/* --- HERO --- */
+.hero-content-wrapper { min-height: 100vh; display: flex; align-items: center; position: relative; z-index: 1; }
+.hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 8vw, 5.5rem);
+    font-weight: 900; line-height: 1.1; letter-spacing: -2px;
+}
+
+.floating-orb {
+    width: 300px; height: 300px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    margin: 0 auto;
+    display: flex; align-items: center; justify-content: center;
+    animation: floating 6s ease-in-out infinite;
+    backdrop-filter: blur(10px);
+}
+
+@keyframes floating {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+/* --- SEARCH & BOOKS (Z-INDEX FIX) --- */
+.search-section { position: relative; z-index: 10; margin-top: -50px; }
+#books-section { position: relative; z-index: 5; }
+
+.search-neon-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; display: flex; align-items: center;
+    padding: 6px; backdrop-filter: blur(15px);
+}
+body.light-mode .search-neon-box { background: #ffffff; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+
+.search-input-field {
+    background: transparent; border: none; color: var(--text);
+    width: 100%; padding: 12px 20px; outline: none;
+}
+
+.book-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 30px; overflow: hidden; transition: 0.4s;
+    height: 100%; backdrop-filter: blur(10px);
+}
+body.light-mode .book-card { background: #ffffff; box-shadow: 0 15px 40px rgba(0,0,0,0.05); }
+
+.book-img { height: 300px; width: 100%; object-fit: cover; }
+
+/* --- MODALS (FIXED VISIBILITY) --- */
+.cyber-modal {
+    background: #0f0b21 !important; /* Solid dark color for visibility */
+    backdrop-filter: blur(25px);
+    border-radius: 35px; border: 1px solid var(--border);
+    color: #ffffff;
+    box-shadow: 0 0 50px rgba(0,0,0,0.5);
+}
+
+body.light-mode .cyber-modal { background: #ffffff !important; color: #1e1b4b; }
+
+.cyber-input {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px; color: inherit; width: 100%; outline: none;
+}
+body.light-mode .cyber-input { background: #f3f4f6; }
+
+/* --- BUTTONS --- */
+.btn-galaxy {
+    background: linear-gradient(135deg, var(--primary), #6d28d9);
+    color: white !important; font-weight: 800; border: none;
+    padding: 12px 30px; border-radius: 15px; transition: 0.3s;
+}
+
+/* --- PROFILE SPECIFIC HELPERS --- */
+.badge-neon {
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--primary);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-weight: 800;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+}
+
+.book-list-item {
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.light-mode .book-list-item {
+    background: #f3f4f6;
+    border-color: rgba(0,0,0,0.05);
+}
+
+body.light-mode .book-list-item h6 {
+    color: #1e1b4b !important;
+}
+
+/* Ensure branding is consistent in Light Mode */
+body.light-mode .brand-text {
+    color: #1e1b4b !important;
+}
+
+/* --- ADMIN TABLE STYLES --- */
+.table-custom {
+    color: var(--text) !important;
+    border-collapse: separate;
+    border-spacing: 0 12px;
+}
+
+.table-custom thead th {
+    border: none;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+    opacity: 0.4;
+    padding: 20px;
+}
+
+.table-custom tbody tr {
+    background: rgba(255, 255, 255, 0.02);
+    transition: 0.3s;
+}
+
+.table-custom tbody tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: scale(1.005);
+}
+
+.table-custom td {
+    border: none;
+    padding: 20px !important;
+    vertical-align: middle;
+}
+
+.user-avatar-mini {
+    width: 32px; height: 32px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 800;
+}
+
+.badge-plan {
+    background: rgba(139, 92, 246, 0.15);
+    color: var(--primary);
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 0.7rem;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.role-tag {
+    color: #3b82f6;
+    font-family: monospace;
+    font-weight: bold;
+}
+
+.status-pill {
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.status-pill.active { background: rgba(44, 182, 125, 0.1); color: #2cb67d; }
+.status-pill.expired { background: rgba(239, 69, 101, 0.1); color: #ef4565; }
+
+.timeline-box { font-size: 0.75rem; font-family: monospace; }
+
+/* Light Mode Overrides */
+body.light-mode .table-custom tbody tr { background: rgba(0,0,0,0.02); }
+body.light-mode .table-custom td { color: #1e1b4b !important; }
+
+/* --- TRANSACTION LEDGER STYLES --- */
+.text-price {
+    color: #2cb67d;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace; /* For a financial feel */
+}
+
+.tx-id-badge {
+    font-family: monospace;
+    color: var(--primary);
+    background: rgba(139, 92, 246, 0.1);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+.item-tag {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    padding-left: 10px;
+    border-left: 3px solid var(--accent);
+}
+
+.timestamp-box {
+    line-height: 1.2;
+    font-size: 0.8rem;
+}
+
+.date-part {
+    font-weight: 700;
+}
+
+/* Light Mode Overrides */
+body.light-mode .text-price {
+    color: #15803d; /* Darker green for contrast */
+}
+body.light-mode .item-tag {
+    color: #1e1b4b;
+}
+
+/* --- CAROUSEL ADMIN SPECIFIC --- */
+.slide-preview-container {
+    padding: 4px;
+    background: var(--border);
+    border-radius: 12px;
+    display: inline-block;
+}
+
+.slide-preview-img {
+    width: 120px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.btn-delete-cyber {
+    background: rgba(239, 69, 101, 0.1);
+    color: #ef4565;
+    border: 1px solid rgba(239, 69, 101, 0.2);
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+.btn-delete-cyber:hover {
+    background: #ef4565;
+    color: white;
+    box-shadow: 0 0 15px rgba(239, 69, 101, 0.4);
+}
+
+body.light-mode .slide-preview-img {
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+body.light-mode .btn-delete-cyber {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+/* --- BOOK ADMIN SPECIFIC --- */
+.book-preview-container {
+    padding: 3px;
+    background: var(--border);
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.book-preview-img {
+    width: 45px;
+    height: 65px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+/* Ensure the select dropdown matches the cyber-input style */
+select.cyber-input {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+}
+
+body.light-mode select.cyber-input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='black'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+}
+
+/* Command Button (Delete) */
+.btn-delete-cyber {
+    background: rgba(239, 69, 101, 0.1);
+    color: #ef4565;
+    border: 1px solid rgba(239, 69, 101, 0.2);
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+.btn-delete-cyber:hover {
+    background: #ef4565;
+    color: white;
+}

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Admin | BookHaven</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Playfair+Display:wght@900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-mode transition-colors duration-500 overflow-x-hidden">
+
+    <div class="nebula-bg"></div>
+    <div class="glow-mesh"></div>
+
+    <nav class="fixed top-6 w-full z-[1050] px-4">
+        <div class="container mx-auto max-w-6xl">
+            <div class="navbar-glass flex items-center justify-between px-8 py-3 rounded-[100px] border border-white/10 shadow-2xl backdrop-blur-2xl">
+                <a class="flex items-center gap-3 no-underline" href="index.html">
+                    <div class="brand-box">⚙️</div>
+                    <span class="brand-text text-xl font-extrabold tracking-tighter">ADMIN CONSOLE</span>
+                </a>
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleMode()" class="utility-btn" id="modeToggle">
+                        <span id="themeIcon">☀️</span>
+                    </button>
+                    <a href="index.html" class="btn-galaxy px-4 py-2 text-sm no-underline">Return to Site</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-32 text-center">
+        <div class="mb-12">
+            <h1 class="hero-title mb-3">Control <span class="text-gradient-neon">Center</span></h1>
+            <p class="opacity-50 tracking-widest uppercase text-xs fw-bold">Select a module to manage your digital library</p>
+            <div class="accent-line mx-auto mt-4" style="width: 60px;"></div>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-3">
+                <a href="admin-books.html" class="cyber-modal p-5 shadow-2xl block no-underline transition-all hover:-translate-y-3 group" target="_blank">
+                    <div class="floating-orb mx-auto mb-4 group-hover:border-violet-400" style="width: 80px; height: 80px;">
+                        <span class="text-4xl">📚</span>
+                    </div>
+                    <h4 class="fw-bold mb-2 text-white group-hover:text-violet-400 transition-colors">Manage Books</h4>
+                    <p class="small opacity-40 m-0">Add, Edit, or Remove library titles</p>
+                </a>
+            </div>
+
+            <div class="col-md-3">
+                <a href="admin-users.html" class="cyber-modal p-5 shadow-2xl block no-underline transition-all hover:-translate-y-3 group" target="_blank">
+                    <div class="floating-orb mx-auto mb-4 group-hover:border-blue-400" style="width: 80px; height: 80px;">
+                        <span class="text-4xl">👥</span>
+                    </div>
+                    <h4 class="fw-bold mb-2 text-white group-hover:text-blue-400 transition-colors">Users</h4>
+                    <p class="small opacity-40 m-0">Promote members or manage roles</p>
+                </a>
+            </div>
+
+            <div class="col-md-3">
+                <a href="admin-payments.html" class="cyber-modal p-5 shadow-2xl block no-underline transition-all hover:-translate-y-3 group" target="_blank">
+                    <div class="floating-orb mx-auto mb-4 group-hover:border-green-400" style="width: 80px; height: 80px;">
+                        <span class="text-4xl">💰</span>
+                    </div>
+                    <h4 class="fw-bold mb-2 text-white group-hover:text-green-400 transition-colors">Payments</h4>
+                    <p class="small opacity-40 m-0">Monitor all credit transactions</p>
+                </a>
+            </div>
+
+            <div class="col-md-3">
+                <a href="admin-carousel.html" class="cyber-modal p-5 shadow-2xl block no-underline transition-all hover:-translate-y-3 group" target="_blank">
+                    <div class="floating-orb mx-auto mb-4 group-hover:border-pink-400" style="width: 80px; height: 80px;">
+                        <span class="text-4xl">🖼️</span>
+                    </div>
+                    <h4 class="fw-bold mb-2 text-white group-hover:text-pink-400 transition-colors">Hero Slides</h4>
+                    <p class="small opacity-40 m-0">Customize the cosmic carousel</p>
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-20">
+            <button onclick="doLogout()" class="btn btn-link text-white opacity-30 text-xs tracking-widest no-underline uppercase hover:opacity-100 transition-opacity">
+                Terminate Admin Session
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- THEME SYNC ---
+        function applySavedTheme() {
+            const savedTheme = localStorage.getItem('themePreference');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                document.getElementById('themeIcon').innerText = '🌙';
+            }
+        }
+
+        function toggleMode() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            body.classList.toggle('light-mode');
+            if (body.classList.contains('light-mode')) {
+                themeIcon.innerText = '🌙';
+                localStorage.setItem('themePreference', 'light');
+            } else {
+                themeIcon.innerText = '☀️';
+                localStorage.setItem('themePreference', 'dark');
+            }
+        }
+
+        // --- SECURITY & SESSION ---
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || user.role !== 'admin') {
+            window.location.href = "index.html";
+        }
+
+        function doLogout() {
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+
+        window.onload = applySavedTheme;
+    </script>
+</body>
+</html>
