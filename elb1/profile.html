@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | BookHaven</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Playfair+Display:wght@900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-mode transition-colors duration-500 overflow-x-hidden">
+
+    <div class="nebula-bg"></div>
+    <div class="glow-mesh"></div>
+
+    <nav class="fixed top-6 w-full z-[1050] px-4">
+        <div class="container mx-auto max-w-6xl">
+            <div class="navbar-glass flex items-center justify-between px-8 py-3 rounded-[100px] border border-white/10 shadow-2xl backdrop-blur-2xl">
+                <a class="flex items-center gap-3 no-underline" href="index.html">
+                    <div class="brand-box">📖</div>
+                    <span class="brand-text text-xl font-extrabold tracking-tighter">BOOKHEAVEN</span>
+                </a>
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleMode()" class="utility-btn" id="modeToggle">
+                        <span id="themeIcon">☀️</span>
+                    </button>
+                    <a href="index.html" class="btn-galaxy px-4 py-2 text-sm no-underline">Back to Library</a>
+                    <button class="btn-galaxy btn-pink px-4 py-2 text-sm" onclick="doLogout()">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-32">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="cyber-modal p-5 text-center shadow-2xl relative overflow-hidden">
+                    <div class="relative z-10">
+                        <div class="mb-4">
+                            <div class="floating-orb mx-auto" style="width: 100px; height: 100px; border-width: 3px;">
+                                <span id="userInitials" class="hero-title text-4xl m-0">U</span>
+                            </div>
+                        </div>
+                        <h3 id="profileName" class="fw-bold mb-1 tracking-tight">Username</h3>
+                        <p id="profileEmail" class="opacity-50 mb-4 small">user@example.com</p>
+                        <span id="planBadge" class="badge-neon mb-4 inline-block">Free Member</span>
+                        
+                        <div class="mt-4">
+                            <div class="plan-card text-center bg-white/5 border-white/5">
+                                <small class="opacity-50 d-block mb-1 uppercase tracking-widest text-[10px] fw-bold">Membership Status</small>
+                                <strong id="expiryStatus" class="text-violet-400">Active until --</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="cyber-modal p-5 mb-4 shadow-2xl">
+                    <h4 class="fw-bold mb-5 tracking-tight flex items-center gap-2">
+                        <span class="text-violet-500">📊</span> Account Overview
+                    </h4>
+                    <div class="row">
+                        <div class="col-md-6 mb-4 mb-md-0">
+                            <div class="p-4 rounded-3xl bg-white/5 border border-white/5">
+                                <label class="small opacity-50 uppercase tracking-widest fw-bold mb-2 d-block">Member Since</label>
+                                <p class="h5 fw-bold m-0" id="memberSince">January 2026</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-4 rounded-3xl bg-white/5 border border-white/5">
+                                <label class="small opacity-50 uppercase tracking-widest fw-bold mb-2 d-block">Library Collection</label>
+                                <p class="h5 fw-bold m-0 text-gradient-neon" id="booksReadCount">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cyber-modal p-5 shadow-2xl">
+                    <div class="d-flex justify-content-between align-items-center mb-5">
+                        <h4 class="fw-bold mb-0 tracking-tight flex items-center gap-2">
+                            <span class="text-pink-500">📚</span> My Bookshelf
+                        </h4>
+                        <a href="index.html#books-section" class="btn-galaxy px-4 py-2 text-xs no-underline">Browse More</a>
+                    </div>
+                    
+                    <div id="loader" class="text-center py-5 hidden">
+                        <div class="spinner-border text-violet-500" role="status"></div>
+                    </div>
+
+                    <div id="userBooks" class="grid gap-3">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="py-12 border-t border-white/5 opacity-40 text-center">
+        <p class="small tracking-widest">© 2026 BOOKHEAVEN • PROFILE SECURED</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // --- THEME SYNC ---
+        function applySavedTheme() {
+            const savedTheme = localStorage.getItem('themePreference');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                document.getElementById('themeIcon').innerText = '🌙';
+            }
+        }
+
+        function toggleMode() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            body.classList.toggle('light-mode');
+            
+            if (body.classList.contains('light-mode')) {
+                themeIcon.innerText = '🌙';
+                localStorage.setItem('themePreference', 'light');
+            } else {
+                themeIcon.innerText = '☀️';
+                localStorage.setItem('themePreference', 'dark');
+            }
+        }
+
+        // --- CORE PROFILE LOGIC ---
+        let currentUser = JSON.parse(localStorage.getItem('user'));
+
+        async function initProfile() {
+            applySavedTheme();
+
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Show loading state
+            document.getElementById('userBooks').innerHTML = '';
+            document.getElementById('loader').classList.remove('hidden');
+
+            try {
+                // Fetch fresh data from server using the email
+                const response = await fetch(`http://localhost:5000/api/user-details?email=${encodeURIComponent(currentUser.email)}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    currentUser = data.user;
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                    renderUI();
+                } else {
+                    console.error("Failed to fetch fresh user data");
+                    renderUI(); // Fallback to current local data
+                }
+            } catch (err) {
+                console.error("Connection error:", err);
+                renderUI(); // Fallback
+            } finally {
+                document.getElementById('loader').classList.add('hidden');
+            }
+        }
+
+        function renderUI() {
+    // Basic Info
+    document.getElementById('profileName').innerText = currentUser.username;
+    document.getElementById('profileEmail').innerText = currentUser.email;
+    document.getElementById('userInitials').innerText = currentUser.username.charAt(0).toUpperCase();
+    document.getElementById('planBadge').innerText = (currentUser.membership_plan || 'Free').toUpperCase() + " MEMBER";
+    
+    // Membership Expiry
+    if (currentUser.end_date && currentUser.membership_plan !== 'free') {
+        const date = new Date(currentUser.end_date).toLocaleDateString('en-IN', {
+            day: 'numeric', month: 'long', year: 'numeric'
+        });
+        document.getElementById('expiryStatus').innerText = `Active until ${date}`;
+    } else {
+        document.getElementById('expiryStatus').innerText = "No active subscription";
+    }
+
+    const container = document.getElementById('userBooks');
+    // Ensure history exists
+    const history = currentUser.history || [];
+    
+    // Filter out transaction logs that aren't books (like "Membership" or "Books Purchase" total)
+    const booksOnly = history.filter(item => {
+        const name = (item.title || item.item_name || "").toLowerCase();
+        return !name.includes('membership') && !name.includes('books purchase');
+    });
+    
+    document.getElementById('booksReadCount').innerText = booksOnly.length;
+
+    if (booksOnly.length > 0) {
+        container.innerHTML = booksOnly.map(book => {
+            // Support both 'title' (from SQL alias) or 'item_name' (direct column)
+            const bookTitle = book.title || book.item_name || "Unknown Title";
+            const purchaseDate = new Date(book.date || book.transaction_date).toLocaleDateString();
+
+            return `
+                <div class="book-list-item flex items-center justify-between p-4 mb-2 rounded-3xl bg-white/5 border border-white/10 transition-all hover:bg-white/10">
+                    <div class="flex items-center">
+                        <div class="me-4 bg-violet-500/20 rounded-xl p-3 text-2xl shadow-inner">📖</div>
+                        <div>
+                            <h6 class="mb-1 text-white fw-bold">${bookTitle}</h6>
+                            <small class="opacity-50 small">Stored in Library • Purchased ${purchaseDate}</small>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-green-500/20 text-green-400 border border-green-500/30 px-3 py-2 rounded-pill mb-2 block" style="font-size: 0.65rem;">READY TO READ</span>
+                        <a href="index.html#books-section" class="btn btn-sm btn-link text-violet-400 p-0 no-underline" style="font-size: 0.7rem;">Open Book</a>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } else {
+        container.innerHTML = `
+            <div class="text-center py-5 opacity-30">
+                <p>No books found in your database record.</p>
+                <a href="index.html#books-section" class="text-violet-400 text-sm">Go to Store</a>
+            </div>`;
+    }
+}
+
+        function doLogout() {
+            localStorage.removeItem('user');
+            localStorage.removeItem('cart');
+            window.location.href = 'index.html';
+        }
+
+        window.onload = initProfile;
+    </script>
+</body>
+</html>
